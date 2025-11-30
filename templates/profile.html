@@ -4,18 +4,22 @@
 {% block content %}
 <div class="max-w-4xl mx-auto space-y-6">
   
+  <!-- Page Header -->
   <div>
     <h1 class="text-2xl font-bold text-gray-800">Account Settings</h1>
     <p class="text-gray-600">Manage your profile information and security</p>
   </div>
 
+  <!-- Alerts Area -->
   <div id="alertContainer" class="hidden">
     <div id="alertBox" class="p-4 rounded-md border">
       <div class="flex">
         <div class="flex-shrink-0">
+          <!-- Success Icon -->
           <svg id="successIcon" class="h-5 w-5 text-green-400 hidden" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
           </svg>
+          <!-- Error Icon -->
           <svg id="errorIcon" class="h-5 w-5 text-red-400 hidden" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
           </svg>
@@ -29,6 +33,7 @@
 
   <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
     
+    <!-- Profile Information Card -->
     <div class="bg-white shadow rounded-lg border border-gray-100">
       <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
         <h2 class="text-lg font-medium text-gray-900">Profile Information</h2>
@@ -70,6 +75,7 @@
       </div>
     </div>
 
+    <!-- Change Password Card -->
     <div class="bg-white shadow rounded-lg border border-gray-100">
       <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
         <h2 class="text-lg font-medium text-gray-900">Change Password</h2>
@@ -152,18 +158,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         const response = await fetch('/auth/me', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        
         if (response.ok) {
             const user = await response.json();
-            document.getElementById('username').value = user.username;
-            document.getElementById('email').value = user.email;
-            document.getElementById('first_name').value = user.first_name;
-            document.getElementById('last_name').value = user.last_name;
+            console.log("User data loaded:", user); // Debugging line
+            
+            // Populate fields with fallback to empty string (NOT "unknown")
+            document.getElementById('username').value = user.username || '';
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('first_name').value = user.first_name || '';
+            document.getElementById('last_name').value = user.last_name || '';
+            
         } else if (response.status === 401) {
+            console.warn("Unauthorized access to profile. Redirecting...");
             localStorage.clear();
             window.location.href = '/login';
+        } else {
+            throw new Error(`Failed to load profile: ${response.statusText}`);
         }
     } catch (e) {
-        console.error('Failed to load profile', e);
+        console.error('Error fetching profile:', e);
+        showAlert('Could not load profile data. Please try refreshing.', 'error');
     }
 
     // --- 2. Handle Profile Update Submission ---
