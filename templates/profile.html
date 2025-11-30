@@ -1,0 +1,270 @@
+{% extends "layout.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+  
+  <div>
+    <h1 class="text-2xl font-bold text-gray-800">Account Settings</h1>
+    <p class="text-gray-600">Manage your profile information and security</p>
+  </div>
+
+  <div id="alertContainer" class="hidden">
+    <div id="alertBox" class="p-4 rounded-md border">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg id="successIcon" class="h-5 w-5 text-green-400 hidden" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <svg id="errorIcon" class="h-5 w-5 text-red-400 hidden" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p id="alertMessage" class="text-sm font-medium"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    
+    <div class="bg-white shadow rounded-lg border border-gray-100">
+      <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+        <h2 class="text-lg font-medium text-gray-900">Profile Information</h2>
+      </div>
+      <div class="p-6">
+        <form id="profileForm" class="space-y-4">
+          <div>
+            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+            <input type="text" name="username" id="username" 
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+          </div>
+          
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" name="email" id="email" 
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
+              <input type="text" name="first_name" id="first_name" 
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+            </div>
+            <div>
+              <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
+              <input type="text" name="last_name" id="last_name" 
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" 
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+              Save Profile
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="bg-white shadow rounded-lg border border-gray-100">
+      <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+        <h2 class="text-lg font-medium text-gray-900">Change Password</h2>
+      </div>
+      <div class="p-6">
+        <form id="passwordForm" class="space-y-4">
+          <div>
+            <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
+            <input type="password" name="current_password" id="current_password" required
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+          </div>
+
+          <div>
+            <label for="new_password" class="block text-sm font-medium text-gray-700">New Password</label>
+            <input type="password" name="new_password" id="new_password" required
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+            <p class="mt-1 text-xs text-gray-500">Must be at least 8 characters with uppercase, lowercase, and numbers.</p>
+          </div>
+
+          <div>
+            <label for="confirm_new_password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+            <input type="password" name="confirm_new_password" id="confirm_new_password" required
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" 
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200">
+              Update Password
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+
+    // --- UI Helpers ---
+    const showAlert = (msg, type) => {
+        const container = document.getElementById('alertContainer');
+        const box = document.getElementById('alertBox');
+        const msgEl = document.getElementById('alertMessage');
+        const successIcon = document.getElementById('successIcon');
+        const errorIcon = document.getElementById('errorIcon');
+
+        container.classList.remove('hidden');
+        msgEl.textContent = msg;
+
+        if (type === 'success') {
+            box.className = 'p-4 rounded-md border border-green-400 bg-green-50';
+            msgEl.className = 'text-sm font-medium text-green-800';
+            successIcon.classList.remove('hidden');
+            errorIcon.classList.add('hidden');
+        } else {
+            box.className = 'p-4 rounded-md border border-red-400 bg-red-50';
+            msgEl.className = 'text-sm font-medium text-red-800';
+            successIcon.classList.add('hidden');
+            errorIcon.classList.remove('hidden');
+        }
+
+        // Auto hide after 5 seconds
+        setTimeout(() => container.classList.add('hidden'), 5000);
+        // Scroll to alert
+        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    // --- 1. Load Current User Data ---
+    try {
+        const response = await fetch('/auth/me', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const user = await response.json();
+            document.getElementById('username').value = user.username;
+            document.getElementById('email').value = user.email;
+            document.getElementById('first_name').value = user.first_name;
+            document.getElementById('last_name').value = user.last_name;
+        } else if (response.status === 401) {
+            localStorage.clear();
+            window.location.href = '/login';
+        }
+    } catch (e) {
+        console.error('Failed to load profile', e);
+    }
+
+    // --- 2. Handle Profile Update Submission ---
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        const originalText = btn.innerHTML;
+        
+        // Disable button
+        btn.disabled = true;
+        btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...';
+
+        const data = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            first_name: document.getElementById('first_name').value,
+            last_name: document.getElementById('last_name').value
+        };
+
+        try {
+            const response = await fetch('/auth/me', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                const updatedUser = await response.json();
+                showAlert('Profile updated successfully', 'success');
+                
+                // Update local storage username for the layout greeting
+                localStorage.setItem('username', updatedUser.username);
+                const welcomeMsg = document.getElementById('layoutUserWelcome');
+                if(welcomeMsg) welcomeMsg.textContent = `Welcome, ${updatedUser.username}!`;
+                
+            } else {
+                const err = await response.json();
+                showAlert(err.detail || 'Failed to update profile', 'error');
+            }
+        } catch (error) {
+            showAlert('Network error occurred', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    });
+
+    // --- 3. Handle Password Change Submission ---
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        const originalText = btn.innerHTML;
+        
+        const data = {
+            current_password: document.getElementById('current_password').value,
+            new_password: document.getElementById('new_password').value,
+            confirm_new_password: document.getElementById('confirm_new_password').value
+        };
+
+        // Frontend validation for matching passwords
+        if (data.new_password !== data.confirm_new_password) {
+            showAlert('New passwords do not match', 'error');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Updating...';
+
+        try {
+            const response = await fetch('/auth/password', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                showAlert('Password changed successfully. Please log in again.', 'success');
+                e.target.reset();
+                
+                // Log the user out after a short delay so they use the new password
+                setTimeout(() => {
+                    localStorage.clear();
+                    window.location.href = '/login';
+                }, 2000);
+            } else {
+                const err = await response.json();
+                showAlert(err.detail || 'Failed to change password', 'error');
+            }
+        } catch (error) {
+            showAlert('Network error occurred', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    });
+});
+</script>
+{% endblock %}

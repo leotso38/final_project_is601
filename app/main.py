@@ -40,6 +40,12 @@ from app.schemas.token import TokenResponse  # API token schema
 from app.schemas.user import UserCreate, UserResponse, UserLogin  # User schemas
 from app.database import Base, get_db, engine  # Database connection
 
+# Add UserUpdate and PasswordUpdate to this existing import
+from app.schemas.user import UserCreate, UserResponse, UserLogin, UserUpdate, PasswordUpdate
+
+# Add these security imports (Adjust the path if your security utils are in app.auth.utils)
+# Based on your file tree, this is likely in app.core.security or app.auth.utils
+from app.core.security import verify_password, get_password_hash
 
 # ------------------------------------------------------------------------------
 # Create tables on startup using the lifespan event
@@ -254,7 +260,91 @@ def login_form(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
         "access_token": auth_result["access_token"],
         "token_type": "bearer"
     }
+# ------------------------------------------------------------------------------
+# User Profile & Password Management Endpoints
+# ------------------------------------------------------------------------------
 
+# 1. HTML Route: Profile Page
+@app.get("/profile", response_class=HTMLResponse, tags=["web"])
+def profile_page(request: Request):
+    """
+    User Profile page.
+    Allows users to view/edit details and change password.
+    """
+    return templates.TemplateResponse("profile.html", {"request": request})
+
+# 2. API Route: Get Current User Details
+@app.get("/auth/me", response_model=UserResponse, tags=["auth"])
+def read_users_me(current_user: User = Depends(get_current_active_user)):
+    """
+    Get current user details.
+    """
+    return current_user
+
+# 3. API Route: Update Profile Information
+@app.put("/auth/me", response_model=UserResponse, tags=["auth"])
+def update_user_me(
+    user_update: UserUpdate,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update user profile information (username, email, names).
+    """
+    # Check for username/email conflicts if they are being changed
+    if user_update.username and user_update.username != current_user.username:
+        existing_user = db.query(User).filter(User.username == user_update.username).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already taken")
+            
+    if user_update.email and user_update.email != current_user.email:
+        existing_email = db.query(User).filter(User.email == user_update.email).first()
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+    # Update fields dynamically
+    user_data = user_update.model_dump(exclude_unset=True)
+    for key, value in user_data.items():
+        setattr(current_user, key, value)
+
+    current_user.updated_at = datetime.now(timezone.utc)
+    
+    try:
+        db.add(current_user)
+        db.commit()
+        db.refresh(current_user)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Could not update profile")
+
+    return current_user
+
+# 4. API Route: Change Password
+@app.put("/auth/password", status_code=status.HTTP_200_OK, tags=["auth"])
+def change_password(
+    password_update: PasswordUpdate,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Change user password. Verify old password first.
+    """
+    # Verify current password matches the DB hash
+    if not verify_password(password_update.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect current password")
+
+    # Hash the new password and save
+    current_user.hashed_password = get_password_hash(password_update.new_password)
+    current_user.updated_at = datetime.now(timezone.utc)
+
+    try:
+        db.add(current_user)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Could not update password")
+
+    return {"message": "Password updated successfully"}
 
 # ------------------------------------------------------------------------------
 # Calculations Endpoints (BREAD)
