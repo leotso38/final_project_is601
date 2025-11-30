@@ -9,7 +9,7 @@ from app.models.calculation import Calculation
 # ---------------------------------------------------------------------------
 # Helper Fixtures and Functions
 # ---------------------------------------------------------------------------
-@pytest.fixture
+@pytest.fixture(scope="session")
 def base_url(fastapi_server: str) -> str:
     """
     Returns the FastAPI server base URL without a trailing slash.

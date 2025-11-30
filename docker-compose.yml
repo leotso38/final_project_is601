@@ -16,7 +16,7 @@ services:
       REFRESH_TOKEN_EXPIRE_DAYS: 7
       BCRYPT_ROUNDS: 12
     command: >
-      sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+      sh -c "python -m app.database_init && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     depends_on:
       db:
         condition: service_healthy
