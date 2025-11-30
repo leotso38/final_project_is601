@@ -16,6 +16,20 @@ from app.database import Base, get_engine, get_sessionmaker
 from app.models.user import User
 from app.core.config import settings
 from app.database_init import init_db, drop_db
+import pytest
+import bcrypt
+import passlib.handlers.bcrypt
+
+# --- SECURITY PATCH START ---
+# Fix 1: Monkeypatch bcrypt to support passlib 1.7.4
+if not hasattr(bcrypt, "__about__"):
+    class About:
+        __version__ = bcrypt.__version__
+    bcrypt.__about__ = About()
+
+# Fix 2: Disable passlib's legacy bcrypt bug check
+# This check uses a long password that crashes newer bcrypt versions (limit 72 bytes).
+passlib.handlers.bcrypt.detect_wrap_bug = lambda ident: False
 
 # ======================================================================================
 # Logging Configuration

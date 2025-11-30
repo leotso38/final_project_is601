@@ -36,13 +36,13 @@ class UserCreate(UserBase):
     """Schema for user creation with password validation"""
     password: str = Field(
         min_length=8,
-        max_length=128,
+        max_length=72,  # FIXED: Reduced from 128 to 72 for bcrypt compatibility
         example="SecurePass123!",
-        description="User's password (8-128 characters)"
+        description="User's password (8-72 characters)"
     )
     confirm_password: str = Field(
         min_length=8,
-        max_length=128,
+        max_length=72,  # FIXED: Reduced from 128 to 72
         example="SecurePass123!",
         description="Password confirmation"
     )
@@ -109,7 +109,7 @@ class UserLogin(BaseModel):
     password: str = Field(
         ...,
         min_length=8,
-        max_length=128,
+        max_length=72,  # FIXED: Reduced to 72 for consistency
         example="SecurePass123!",
         description="Password"
     )
@@ -159,21 +159,21 @@ class PasswordUpdate(BaseModel):
     current_password: str = Field(
         ...,
         min_length=8,
-        max_length=128,
+        max_length=72,  # FIXED: Reduced to 72
         example="OldPass123!",
         description="Current password"
     )
     new_password: str = Field(
         ...,
         min_length=8,
-        max_length=128,
+        max_length=72,  # FIXED: Reduced to 72
         example="NewPass123!",
         description="New password"
     )
     confirm_new_password: str = Field(
         ...,
         min_length=8,
-        max_length=128,
+        max_length=72,  # FIXED: Reduced to 72
         example="NewPass123!",
         description="Confirm new password"
     )
