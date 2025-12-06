@@ -133,6 +133,15 @@ class User(Base):
         """Return the stored hashed password."""
         return self.password
 
+    @hashed_password.setter
+    def hashed_password(self, value):
+        """
+        Set the password field. 
+        Note: The value passed here is expected to be ALREADY hashed, 
+        as main.py calls get_password_hash() before assignment.
+        """
+        self.password = value
+
     def verify_password(self, plain_password: str) -> bool:
         """
         Verify a plain-text password against this user's stored hashed password.

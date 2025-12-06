@@ -39,28 +39,32 @@
         <h2 class="text-lg font-medium text-gray-900">Profile Information</h2>
       </div>
       <div class="p-6">
-        <form id="profileForm" class="space-y-4">
+        <form id="profileForm" class="space-y-4" autocomplete="off">
+          <!-- Hidden inputs to trick browser autofill -->
+          <input type="text" style="display:none">
+          <input type="password" style="display:none">
+
           <div>
             <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-            <input type="text" name="username" id="username" 
+            <input type="text" name="username" id="username" autocomplete="off"
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
           </div>
           
           <div>
             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" name="email" id="email" 
+            <input type="email" name="email" id="email" autocomplete="off"
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
-              <input type="text" name="first_name" id="first_name" 
+              <input type="text" name="first_name" id="first_name" autocomplete="off"
                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
             </div>
             <div>
               <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
-              <input type="text" name="last_name" id="last_name" 
+              <input type="text" name="last_name" id="last_name" autocomplete="off"
                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
             </div>
           </div>
@@ -81,23 +85,23 @@
         <h2 class="text-lg font-medium text-gray-900">Change Password</h2>
       </div>
       <div class="p-6">
-        <form id="passwordForm" class="space-y-4">
+        <form id="passwordForm" class="space-y-4" autocomplete="off">
           <div>
             <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
-            <input type="password" name="current_password" id="current_password" required
+            <input type="password" name="current_password" id="current_password" required autocomplete="new-password"
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
           </div>
 
           <div>
             <label for="new_password" class="block text-sm font-medium text-gray-700">New Password</label>
-            <input type="password" name="new_password" id="new_password" required
+            <input type="password" name="new_password" id="new_password" required autocomplete="new-password"
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
             <p class="mt-1 text-xs text-gray-500">Must be at least 8 characters with uppercase, lowercase, and numbers.</p>
           </div>
 
           <div>
             <label for="confirm_new_password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
-            <input type="password" name="confirm_new_password" id="confirm_new_password" required
+            <input type="password" name="confirm_new_password" id="confirm_new_password" required autocomplete="new-password"
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
           </div>
 
@@ -147,9 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             errorIcon.classList.remove('hidden');
         }
 
-        // Auto hide after 5 seconds
         setTimeout(() => container.classList.add('hidden'), 5000);
-        // Scroll to alert
         container.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
@@ -161,24 +163,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         if (response.ok) {
             const user = await response.json();
-            console.log("User data loaded:", user); // Debugging line
+            console.log("Fetched user data:", user); // Debug log
             
-            // Populate fields with fallback to empty string (NOT "unknown")
+            // Populate fields directly from the API response without filtering
             document.getElementById('username').value = user.username || '';
             document.getElementById('email').value = user.email || '';
             document.getElementById('first_name').value = user.first_name || '';
             document.getElementById('last_name').value = user.last_name || '';
             
         } else if (response.status === 401) {
-            console.warn("Unauthorized access to profile. Redirecting...");
+            console.warn("Unauthorized. Clearing token and redirecting.");
             localStorage.clear();
             window.location.href = '/login';
         } else {
-            throw new Error(`Failed to load profile: ${response.statusText}`);
+            console.error("Failed to load profile:", response.statusText);
+            showAlert('Failed to load profile data.', 'error');
         }
     } catch (e) {
         console.error('Error fetching profile:', e);
-        showAlert('Could not load profile data. Please try refreshing.', 'error');
+        showAlert('Network error while loading profile.', 'error');
     }
 
     // --- 2. Handle Profile Update Submission ---
@@ -187,7 +190,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const btn = e.target.querySelector('button');
         const originalText = btn.innerHTML;
         
-        // Disable button
         btn.disabled = true;
         btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...';
 
@@ -212,16 +214,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const updatedUser = await response.json();
                 showAlert('Profile updated successfully', 'success');
                 
-                // Update local storage username for the layout greeting
-                localStorage.setItem('username', updatedUser.username);
-                const welcomeMsg = document.getElementById('layoutUserWelcome');
-                if(welcomeMsg) welcomeMsg.textContent = `Welcome, ${updatedUser.username}!`;
+                // Update local storage username for the header greeting
+                if (updatedUser.username) {
+                    localStorage.setItem('username', updatedUser.username);
+                    const welcomeMsg = document.getElementById('layoutUserWelcome');
+                    if(welcomeMsg) welcomeMsg.textContent = `Welcome, ${updatedUser.username}!`;
+                }
                 
             } else {
                 const err = await response.json();
                 showAlert(err.detail || 'Failed to update profile', 'error');
             }
         } catch (error) {
+            console.error(error);
             showAlert('Network error occurred', 'error');
         } finally {
             btn.disabled = false;
@@ -241,7 +246,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             confirm_new_password: document.getElementById('confirm_new_password').value
         };
 
-        // Frontend validation for matching passwords
         if (data.new_password !== data.confirm_new_password) {
             showAlert('New passwords do not match', 'error');
             return;
@@ -263,8 +267,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (response.ok) {
                 showAlert('Password changed successfully. Please log in again.', 'success');
                 e.target.reset();
-                
-                // Log the user out after a short delay so they use the new password
                 setTimeout(() => {
                     localStorage.clear();
                     window.location.href = '/login';
@@ -274,6 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showAlert(err.detail || 'Failed to change password', 'error');
             }
         } catch (error) {
+            console.error(error);
             showAlert('Network error occurred', 'error');
         } finally {
             btn.disabled = false;
